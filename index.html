@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Прокат скейтбордів у Львові</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>    
+  <header class="site-header">
+  <div class="logo">SkateLviv</div>
+  
+  <nav class="main-nav">
+    <a href="#services" class="nav-link">Про нас</a>
+    <a href="#types" class="nav-link">Скейтборди</a>
+    <a href="#prices" class="nav-link">Ціни</a>
+    <a href="#booking" class="nav-link">Бронювання</a>
+  </nav>
+  
+  <div class="mobile-menu-toggle">
+  <button id="menu-toggle" class="hamburger-button">
+    <img src="img/burger.png" alt="" class="hamburger-icon">
+  </button>
+ </div>
+
+  <button onclick="window.location.href='#booking'" class="booking-button">Забронювати</button>
+</header>
+
+<div id="mobile-menu" class="mobile-menu">
+  <a href="#services" class="mobile-menu-link">Про нас</a>
+  <a href="#types" class="mobile-menu-link">Скейтборди</a>
+  <a href="#prices" class="mobile-menu-link">Ціни</a>
+  <a href="#booking" class="mobile-menu-link">Бронювання</a>
+</div>
+  
+<section class="hero-section">
+  <div class="hero-content">
+    <h1 class="hero-title">Прокат скейтбордів у Львові</h1>
+    <p class="hero-subtitle">Відчуй свободу на колесах!</p>
+  </div>
+</section>
+
+<section class="promo-section">
+  <div class="container">
+    <p class="promo-text">Перша поїздка -25% – твій початок скейт-пригод!</p>
+    <button onclick="window.location.href='#booking'" class="promo-button">Замов зараз!</button>
+  </div>
+</section>
+
+<section class="video-section">
+  <div class="container">
+    <h1>Тільки глянь як це круто!!!</h2>
+    <div class="video-container">
+      <video class="video-player" autoplay muted loop poster="img/poster.jpg">
+        <source src="img/skateboard-video.mp4" type="video/mp4">
+        Ваш браузер не підтримує відео елемент.
+      </video>
+    </div>
+  </div>
+</section>
+
+<section id="services" class="community-section">
+  <div class="container">
+    
+      <h1>SkateLviv – більше ніж прокат, це спільнота!</h2>
+      <p>Ми – команда фанатів скейтбордингу, яка об’єдналася, щоб подарувати Львову свободу на колесах.</p>
+      
+      <h3>Чому варто обрати нас?</h3>
+      <div class="feature-item">
+        <span>✅</span><span><strong>Якісний інвентар</strong> – тільки перевірені бренди (Santa Cruz, Element, Penny) та регулярний сервіс</span>
+      </div>
+      <div class="feature-item">
+        <span>✅</span><span><strong>Гнучкі умови</strong> – орендуй на годину, день або тиждень – без прихованих платежів</span>
+      </div>
+      <div class="feature-item">
+        <span>✅</span>
+        <span><strong>Допомога новачкам</strong> – безкоштовний інструктаж та підбір дошки під ваш стиль</span>
+      </div>
+      <div class="feature-item">
+        <span>✅</span>
+        <span><strong>Культурний хаб</strong> – організовуємо тусовки, змагання та міські заїзди</span>
+      </div> 
+      <h3>Наша місія</h3>
+      <p>Розвивати скейт-культуру у Львові та робити її доступною для всіх.<br>
+      Тут немає "некрутих" – лише свобода, адреналін та асфальтова ріка міста під колесами.</p>
+      <p><strong>"Не знаєш, як почати? Просто приходь – допоможемо!"</strong></p>
+         
+  </div>
+</section>
+
+<section id="types" class="types-section">
+        <div class="container">
+            <h2 class="types-title">Типи скейтбордів</h2>
+            <div class="types-grid">
+                <div class="type-card skate1">
+                    <img src="img/classic.jpg" alt="Класичний скейтборд" class="type-image">
+                    <h2>Класичний</h2>
+                </div>
+                <div class="skate1d">
+                    Для трюків та міських вулиць
+                        <ul>
+                          <li>Вузька підвіска для чуттєвого контролю</li>
+                          <li>Жорсткі колеса (99-101A) для ковзання по перилам</li>
+                          <li>Ідеальний для: гріндов, фліпів, стійок на задніх колесах</li>
+                        </ul>
+                    </div>
+                <div class="type-card skate2">
+                    <img src="img/cruiser.jpg" alt="Лонгборд" class="type-image">
+                    <h2>Круїзер</h2>
+                </div>
+                <div class="skate2d">
+                        Для комфортних міських подорожей
+                        <ul>
+                          <li>Широкий дек з загнутим хвостом</li>
+                          <li>М'які колеса (78-85A) для гладкого ковзання</li>
+                          <li>Ідеальний для: поїздок до кав'ярні, навчання основ</li>
+                        </ul>
+                        
+                    </div>
+                <div class="type-card skate3">
+                    <img src="img/longboard.jpg" alt="Круїзер" class="type-image">
+                    <h2>Лонгборд</h2>
+                </div>     
+                    <div class="skate3d">
+                        Для рамп та скейт-парків
+                        <ul>
+                          <li>Міцна конструкція з широкою дошкою</li>
+                          <li>Середні колеса (90-97A) для стабільності</li>
+                          <li>Ідеальний для: в'їздів на вертикальні стінки, повітряних трюків</li>
+                        </ul>
+                      
+                    </div>
+            </div>
+        </div>
+    </section>
+
+<section id="prices" class="pricing-section">
+        <div class="container">
+            <h2>Ціни та умови оренди</h2>
+            <div class="pricing-grid">
+                <div onclick="window.location.href='#booking'" class="price-card hourly">
+                    
+                    <h1>100₴ / година</h1>
+                    <p>Ідеально для коротких заїздів і спонтанних прогулянок.</p>
+                    
+                </div>
+                
+                <div onclick="window.location.href='#booking'" class="price-card daily">
+                    
+                    <h1>200₴ / день</h1>
+                    <p>Оптимально для цілоденних пригод у Львові.</p>
+                     
+                </div>
+                
+                <div onclick="window.location.href='#booking'" class="price-card weekly">
+                    
+                    <h1>600₴ / тиждень</h1>
+                    <p>Максимальна вигода для тривалого користування.</p>
+                     
+                </div>
+            </div>
+        </div>
+    </section>
+
+
+
+<section class="testimonials-section">
+        <div class="container">
+            <h2>Відгуки клієнтів</h2>
+            <div class="testimonials-grid">
+                
+                <div class="testimonial-card">
+                    <img src="img/user1.jpg" alt="Клієнт 1" class="client-avatar">
+                    <p class="testimonial-text">Крутий сервіс, все швидко!</p>
+                    <div class="rating">★★★★★</div>
+                    <div class="client-name">Олександра</div>
+                </div>
+                
+                
+                <div class="testimonial-card">
+                    <img src="img/user2.jpg" alt="Клієнт 2" class="client-avatar">
+                    <p class="testimonial-text">Якість скейтів на рівні!</p>
+                    <div class="rating">★★★★☆</div>
+                    <div class="client-name">Марія</div>
+                </div>
+                
+                
+                <div class="testimonial-card">
+                    <img src="img/user3.jpg" alt="Клієнт 3" class="client-avatar">
+                    <p class="testimonial-text">Приємна ціна та локація!</p>
+                    <div class="rating">★★★★★</div>
+                    <div class="client-name">Андрій</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+
+
+<section id="booking" class="booking-section">
+        <div class="booking-container">
+            <h2>Форма бронювання</h2>
+            <form class="booking-form">
+                
+                <div class="form-group">
+                    <label for="firstName" class="form-label">Ім'я*</label>
+                    <input type="text" id="firstName" placeholder="Введіть ваше ім'я" required class="form-input">
+                </div>
+                    
+                
+                <div class="form-group">
+                    <label for="email" class="form-label">Email*</label>
+                    <input type="email" id="email" placeholder="Введіть ваш email" required class="form-input">
+                </div>
+                
+                <div class="form-group">
+                    <label for="phone" class="form-label">Телефон*</label>
+                    <input type="tel" id="phone" placeholder="Введіть ваш телефон" required class="form-input">
+                </div>
+                
+                
+                <div class="form-group">
+                    <label for="date" class="form-label">Дата*</label>
+                    <input type="date" id="date" required class="form-input">
+                </div>
+
+                <div class="form-group">
+                    <label for="time" class="form-label">Час*</label>
+                    <input type="time" id="time" required class="form-input">
+                </div>
+                
+                
+                <div class="form-group">
+                    <label for="skateType" class="form-label">Тип скейтборду</label>
+                    <select id="skateType" class="form-input">
+                        <option value="">Виберіть тип</option>
+                        <option value="classic">Класичний</option>
+                        <option value="longboard">Лонгборд</option>
+                        <option value="cruiser">Круїзер</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="duration" class="form-label">Тривалість оренди*</label>
+                    <select id="duration" required class="form-input">
+                        <option value="">Виберіть тривалість</option>
+                        <option value="1h">1 година</option>
+                        <option value="2h">2 години</option>
+                        <option value="4h">4 години</option>
+                        <option value="1d">1 день</option>
+                        <option value="1w">1 тиждень</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="notes" class="form-label">Додаткові побажання</label>
+                    <textarea id="notes" class="form-input form-textarea" placeholder="Ваші побажання..."></textarea>
+                </div>
+                
+                <div class="checkbox-group">
+                    <input type="checkbox" id="terms" required class="checkbox-input">
+                    <label for="terms" class="checkbox-label">
+                        Я погоджуюсь з <a href="#">умовами оренди</a> та обробки персональних даних*
+                    </label>
+                </div>
+                
+                <button type="submit" class="submit-btn">Забронювати</button>
+            </form>
+        </div>
+    </section>
+
+
+
+
+
+
+
+
+<section class="contacts-section">
+    <div class="container">
+          <h3>Контакти та соціальні мережі</h3>
+          <p>телефон: +380 97 000 0000<br>
+          email: skate@lviv.ua</p>
+    
+        <div class="social-links">
+              <a href="#">Instagram</a>                
+              <span>|</span>               
+              <a href="#">Facebook</a>
+        </div>
+    </div>
+</section>
+
+
+
+
+    
+<footer class="footer">      
+      © 2025 SkateLviv. Всі права захищені.      
+</footer>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<script>
+    document.getElementById('menu-toggle').addEventListener('click', function() {
+  const menu = document.getElementById('mobile-menu');
+  menu.classList.toggle('active');
+});
+  </script>
+</body>
+</html>
