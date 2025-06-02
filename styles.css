@@ -120,11 +120,10 @@ background-color: #f3f4f6;
   display: block;
 }
 
-
 /* Секція героя */
 .hero-section {
   height: 62vh;
-  background-image: url('img/hero-image.jpg');
+  background-image: url('img/hero-image.avif');
   background-size: cover;
   background-position: center;
   display: flex;
@@ -223,7 +222,6 @@ background-color: #f3f4f6;
   display: block;
 }
 
-
 .community-section {
   color: #333;
   text-align: center;
@@ -241,14 +239,10 @@ background-color: #f3f4f6;
   text-align: start;
 }
 
-
-
-
 .types-section {
   background-color: #e6fffa;
   padding: 1rem 0;
 }
-
 
 .types-title {
   font-size: 1.5rem;
@@ -293,8 +287,6 @@ background-color: #f3f4f6;
    margin-top: 1rem;
 }
         
-
-
 .pricing-section {
   background-color: #581c87; 
   color: white;
@@ -302,7 +294,11 @@ background-color: #f3f4f6;
   padding-bottom: 2rem;
   text-align: center;
 }
-        
+
+.price {
+  font-size: 1.5rem;
+}
+
 .pricing-grid {
   display: grid;
   gap: 2.5rem;
@@ -341,15 +337,6 @@ background-color: #f3f4f6;
   color: #581c87; 
 }
         
-        
-        
-
-
-
-
-
-
-
 .testimonials-section {
   background-color: #ffedd5;
   padding-top: 1rem;
@@ -367,7 +354,6 @@ background-color: #f3f4f6;
     grid-template-columns: repeat(3, 1fr);
   }
 }
-        
         
 .testimonial-card {
   background-color: white;
@@ -405,12 +391,6 @@ background-color: #f3f4f6;
   margin-top: 0.5rem;
 }
 
-
-
-
-
-
-
 .booking-section {
   padding: 1rem 0;
   text-align: center;
@@ -428,8 +408,7 @@ background-color: #f3f4f6;
   border-radius: 0.5rem;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
-        
- 
+
 .form-group {
   margin-bottom: 1rem;
 }
@@ -489,9 +468,6 @@ background-color: #f3f4f6;
 .submit-btn:hover {
   background-color: #6b21a8; 
 }
-        
-
-
 
 .contacts-section {
   background-color: #e5e7eb; 
@@ -507,12 +483,9 @@ background-color: #f3f4f6;
   font-weight: 600; 
 }
 
-
-
 .footer {
    background-color: #6b21a8;
    color: white;
    text-align: center;
    padding: 1.5rem 1rem;
 }
-
