@@ -123,7 +123,7 @@ background-color: #f3f4f6;
 /* Секція героя */
 .hero-section {
   height: 62vh;
-  background-image: url('img/hero-image.avif');
+  background-image: url('img/hero-image.webp');
   background-size: cover;
   background-position: center;
   display: flex;
