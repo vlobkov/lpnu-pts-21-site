@@ -1,0 +1,721 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Snake.io Clone with AI & Touch Controls</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #111;
+            color: #fff;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            overflow: hidden;
+            user-select: none;
+            touch-action: none;
+        }
+
+        #game-container {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+            background-color: #1a1a1a;
+        }
+
+        canvas {
+            display: block;
+            width: 100%;
+            height: 100%;
+        }
+
+        /* Leaderboard styling */
+        #leaderboard {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: rgba(0, 0, 0, 0.7);
+            padding: 10px;
+            border-radius: 8px;
+            border: 1px solid #333;
+            min-width: 150px;
+            max-width: 200px;
+        }
+
+        #leaderboard h3 {
+            margin: 0 0 5px 0;
+            text-align: center;
+            color: #00ffcc;
+            border-bottom: 1px solid #333;
+            padding-bottom: 5px;
+            font-size: 14px;
+        }
+
+        .leaderboard-entry {
+            display: flex;
+            justify-content: space-between;
+            margin: 3px 0;
+            font-size: 12px;
+        }
+
+        .leaderboard-entry.player {
+            color: #00ffcc;
+            font-weight: bold;
+        }
+
+        /* HUD styling */
+        #hud {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background: rgba(0, 0, 0, 0.7);
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-size: 14px;
+            cursor: pointer;
+            z-index: 10;
+        }
+
+        /* Minimap Container */
+        #minimap-container {
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+            width: 100px;
+            height: 100px;
+            background: rgba(0, 0, 0, 0.8);
+            border: 2px solid #444;
+            border-radius: 50%;
+            overflow: hidden;
+        }
+
+        #minimap {
+            width: 100%;
+            height: 100%;
+        }
+
+        /* Mobile Joystick Styles */
+        #joystick-container {
+            position: absolute;
+            bottom: 30px;
+            left: 30px;
+            width: 120px;
+            height: 120px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            touch-action: none;
+        }
+
+        #joystick-knob {
+            width: 50px;
+            height: 50px;
+            background: rgba(0, 255, 204, 0.6);
+            border-radius: 50%;
+            position: absolute;
+            pointer-events: none;
+        }
+
+        /* Mobile Boost Button */
+        #boost-btn {
+            position: absolute;
+            bottom: 40px;
+            right: 130px;
+            width: 70px;
+            height: 70px;
+            background: rgba(255, 51, 102, 0.6);
+            border: 2px solid rgba(255, 51, 102, 0.8);
+            border-radius: 50%;
+            color: white;
+            font-weight: bold;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 14px;
+            touch-action: none;
+        }
+
+        #game-over {
+            display: none;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0, 0, 0, 0.9);
+            padding: 30px;
+            border-radius: 10px;
+            text-align: center;
+            border: 2px solid #ff3333;
+            width: 80%;
+            max-width: 300px;
+        }
+
+        #game-over h1 {
+            color: #ff3333;
+            margin-top: 0;
+        }
+
+        #restart-btn {
+            background: #00ffcc;
+            color: #000;
+            border: none;
+            padding: 10px 20px;
+            font-size: 16px;
+            font-weight: bold;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 15px;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="game-container">
+        <canvas id="gameCanvas"></canvas>
+
+        <div id="hud">
+            <div>Score: <span id="score">0</span></div>
+            <div style="font-size: 10px; color: #aaa; margin-top: 3px; text-align: center;">Tap here for Fullscreen</div>
+        </div>
+
+        <div id="leaderboard">
+            <h3>Leaderboard</h3>
+            <div id="leaderboard-content"></div>
+        </div>
+
+        <!-- Virtual Touch Controls -->
+        <div id="joystick-container">
+            <div id="joystick-knob"></div>
+        </div>
+        <div id="boost-btn">BOOST</div>
+
+        <div id="minimap-container">
+            <canvas id="minimap" width="100" height="100"></canvas>
+        </div>
+
+        <div id="game-over">
+            <h1>Game Over</h1>
+            <p>You crashed!</p>
+            <p>Final Length: <span id="final-score">0</span></p>
+            <button id="restart-btn" onclick="resetGame()">Respawn</button>
+        </div>
+    </div>
+
+    <script>
+        const container = document.getElementById('game-container');
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        const minimapCanvas = document.getElementById('minimap');
+        const miniCtx = minimapCanvas.getContext('2d');
+        const hudElement = document.getElementById('hud');
+
+        // Joystick DOM items
+        const joystickContainer = document.getElementById('joystick-container');
+        const joystickKnob = document.getElementById('joystick-knob');
+        const boostBtn = document.getElementById('boost-btn');
+
+        // Game Configuration
+        const WORLD_SIZE = 3000; 
+        const FOOD_COUNT = 300;
+        const AI_COUNT = 15;
+        
+        let player;
+        let snakes = [];
+        let foods = [];
+        let camera = { x: 0, y: 0 };
+        let mouse = { x: 0, y: 0 };
+        let keys = {};
+        let isGameOver = false;
+
+        // Touch states
+        let joystickActive = false;
+        let joystickAngle = 0;
+        let touchBoosting = false;
+        let lastInputType = 'mouse'; // Tracks if player is using mobile joystick or desktop pointer
+
+        const AI_NAMES = ['SirSlither', 'Pythonic', 'SneakyPete', 'Coiler', 'Naga', 'Viper', 'Basilisk', 'Anaconda', 'Kaa', 'Ouroboros', 'DangerNoodle', 'Wiggle'];
+        const COLORS = ['#ff3366', '#33ff66', '#3366ff', '#ffff33', '#ff33ff', '#33ffff', '#ff9933', '#9933ff'];
+
+        function randomRange(min, max) { return Math.random() * (max - min) + min; }
+        function getDistance(x1, y1, x2, y2) { return Math.hypot(x2 - x1, y2 - y1); }
+
+        class Snake {
+            constructor(x, y, name, isAI = true) {
+                this.name = name;
+                this.isAI = isAI;
+                this.color = COLORS[Math.floor(Math.random() * COLORS.length)];
+                this.speed = 4;
+                this.boostSpeed = 7;
+                this.currentSpeed = this.speed;
+                this.angle = randomRange(0, Math.PI * 2);
+                this.radius = 12;
+                this.score = 10;
+                this.isBoosting = false;
+                this.aiTargetAngle = this.angle;
+
+                // Anti-circling / Anti-stuck variables
+                this.aiStuckTimer = 0;
+                this.aiWanderAngle = this.angle;
+                this.preferredTurnDirection = Math.random() < 0.5 ? 1 : -1;
+
+                this.segments = [];
+                for (let i = 0; i < this.score; i++) {
+                    this.segments.push({ x: x - i * 5, y: y });
+                }
+            }
+
+            update() {
+                if (this.segments.length === 0) return;
+                let head = this.segments[0];
+
+                if (this.isBoosting && this.segments.length > 5) {
+                    this.currentSpeed = this.boostSpeed;
+                    if (Math.random() < 0.1) {
+                        let tail = this.segments[this.segments.length - 1];
+                        foods.push(new Food(tail.x + randomRange(-10, 10), tail.y + randomRange(-10, 10)));
+                        this.segments.pop();
+                        this.score = this.segments.length;
+                    }
+                } else {
+                    this.currentSpeed = this.speed;
+                }
+
+                if (this.isAI) {
+                    this.handleAI();
+                } else {
+                    this.handlePlayerControls();
+                }
+
+                head.x += Math.cos(this.angle) * this.currentSpeed;
+                head.y += Math.sin(this.angle) * this.currentSpeed;
+
+                head.x = Math.max(this.radius, Math.min(WORLD_SIZE - this.radius, head.x));
+                head.y = Math.max(this.radius, Math.min(WORLD_SIZE - this.radius, head.y));
+
+                for (let i = this.segments.length - 1; i > 0; i--) {
+                    let seg = this.segments[i];
+                    let nextSeg = this.segments[i - 1];
+                    let dist = getDistance(seg.x, seg.y, nextSeg.x, nextSeg.y);
+                    let targetDist = 6;
+
+                    if (dist > targetDist) {
+                        let angle = Math.atan2(nextSeg.y - seg.y, nextSeg.x - seg.x);
+                        seg.x = nextSeg.x - Math.cos(angle) * targetDist;
+                        seg.y = nextSeg.y - Math.sin(angle) * targetDist;
+                    }
+                }
+            }
+
+            handlePlayerControls() {
+                if (joystickActive) {
+                    this.angle = joystickAngle;
+                    this.isBoosting = touchBoosting;
+                    return;
+                }
+
+                // Keyboard overrides everything
+                let dx = 0; let dy = 0;
+                if (keys['ArrowUp'] || keys['KeyW']) dy = -1;
+                if (keys['ArrowDown'] || keys['KeyS']) dy = 1;
+                if (keys['ArrowLeft'] || keys['KeyA']) dx = -1;
+                if (keys['ArrowRight'] || keys['KeyD']) dx = 1;
+
+                if (dx !== 0 || dy !== 0) {
+                    this.angle = Math.atan2(dy, dx);
+                    lastInputType = 'keyboard';
+                } else if (lastInputType === 'mouse') {
+                    // Only track raw touch pointer positions if we aren't using the mobile joystick
+                    let screenCenterX = canvas.width / 2;
+                    let screenCenterY = canvas.height / 2;
+                    let targetX = mouse.x - screenCenterX;
+                    let targetY = mouse.y - screenCenterY;
+                    if (Math.hypot(targetX, targetY) > 20) {
+                        this.angle = Math.atan2(targetY, targetX);
+                    }
+                }
+                
+                // Keep boosting configurations mapped cleanly
+                this.isBoosting = keys['Space'] || (lastInputType === 'mouse' && mouse.isDown) || (lastInputType === 'touch' && touchBoosting);
+            }
+
+            handleAI() {
+                let head = this.segments[0];
+                let dangerousObject = false;
+
+                // --- 1. OVERRIDE ESCAPE MODE ---
+                if (this.aiStuckTimer > 0) {
+                    this.aiStuckTimer--;
+                    this.aiTargetAngle = this.aiWanderAngle;
+                    
+                    let threatDetected = false;
+                    for (let snake of snakes) {
+                        if (snake === this) continue;
+                        let d = getDistance(head.x, head.y, snake.segments[0].x, snake.segments[0].y);
+                        if (d < 60) threatDetected = true;
+                    }
+                    if (!threatDetected) {
+                        this.smoothTurn(0.12);
+                        return;
+                    }
+                }
+
+                // --- 2. ADVANCED RAYCAST COLLISION DETECTION ---
+                let lookDist = 110; 
+                let anglesToCheck = [0, -Math.PI / 4, Math.PI / 4, -Math.PI / 2, Math.PI / 2];
+                let absoluteThreatCount = 0;
+
+                for (let angleOffset of anglesToCheck) {
+                    let checkAngle = this.angle + angleOffset;
+                    let rayX = head.x + Math.cos(checkAngle) * lookDist;
+                    let rayY = head.y + Math.sin(checkAngle) * lookDist;
+
+                    if (rayX < 120 || rayX > WORLD_SIZE - 120 || rayY < 120 || rayY > WORLD_SIZE - 120) {
+                        absoluteThreatCount++;
+                        dangerousObject = true;
+                        this.aiTargetAngle = Math.atan2(WORLD_SIZE / 2 - head.y, WORLD_SIZE / 2 - head.x) + (Math.random() - 0.5);
+                        break;
+                    }
+
+                    for (let snake of snakes) {
+                        for (let idx = 0; idx < snake.segments.length; idx++) {
+                            if (snake === this && idx < 8) continue; 
+                            
+                            let seg = snake.segments[idx];
+                            let d = getDistance(rayX, rayY, seg.x, seg.y);
+                            
+                            if (d < (this.radius + snake.radius + 15)) {
+                                absoluteThreatCount++;
+                                dangerousObject = true;
+                                
+                                let angleToThreat = Math.atan2(seg.y - head.y, seg.x - head.x);
+                                this.aiTargetAngle = angleToThreat + (Math.PI / 1.5) * this.preferredTurnDirection;
+                                
+                                this.isBoosting = (d < 45 && this.segments.length > 12 && snake !== this);
+                                break;
+                            }
+                        }
+                        if (dangerousObject) break;
+                    }
+                    if (dangerousObject && absoluteThreatCount < 2) break; 
+                }
+
+                // --- 3. TRIGGER ANTI-LOOP SAFETY SYSTEM ---
+                if (dangerousObject) {
+                    if (Math.random() < 0.03) { 
+                        this.preferredTurnDirection *= -1;
+                    }
+                    if (Math.random() < 0.01) { 
+                        this.aiStuckTimer = 50; 
+                        this.aiWanderAngle = this.angle + Math.PI * randomRange(0.6, 1.2); 
+                    }
+                }
+
+                // --- 4. TARGET FOOD (IF PATH IS CLEAR) ---
+                if (!dangerousObject) {
+                    this.isBoosting = false;
+                    let closestFood = null;
+                    let minDist = 300; 
+
+                    for (let food of foods) {
+                        let d = getDistance(head.x, head.y, food.x, food.y);
+                        if (d < minDist) {
+                            minDist = d;
+                            closestFood = food;
+                        }
+                    }
+                    if (closestFood) {
+                        this.aiTargetAngle = Math.atan2(closestFood.y - head.y, closestFood.x - head.x);
+                    } else {
+                        if (Math.random() < 0.02) {
+                            this.aiTargetAngle += randomRange(-1, 1);
+                        }
+                    }
+                }
+
+                this.smoothTurn(0.15);
+            }
+
+            smoothTurn(turnRate) {
+                let diff = this.aiTargetAngle - this.angle;
+                while (diff < -Math.PI) diff += Math.PI * 2;
+                while (diff > Math.PI) diff -= Math.PI * 2;
+                this.angle += diff * turnRate; 
+            }
+
+            grow(amount) {
+                this.score += amount;
+                let lastSeg = this.segments[this.segments.length - 1] || {x: WORLD_SIZE/2, y: WORLD_SIZE/2};
+                for (let i = 0; i < amount; i++) {
+                    this.segments.push({ x: lastSeg.x, y: lastSeg.y });
+                }
+            }
+
+            draw() {
+                if (this.segments.length === 0) return;
+                ctx.fillStyle = this.color;
+                for (let i = this.segments.length - 1; i > 0; i--) {
+                    let seg = this.segments[i];
+                    ctx.beginPath();
+                    ctx.arc(seg.x - camera.x, seg.y - camera.y, this.radius * (1 - i/this.segments.length * 0.3), 0, Math.PI * 2);
+                    ctx.fill();
+                }
+
+                let head = this.segments[0];
+                ctx.fillStyle = '#ffffff';
+                ctx.beginPath();
+                ctx.arc(head.x - camera.x, head.y - camera.y, this.radius + 2, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.fillStyle = this.color;
+                ctx.beginPath();
+                ctx.arc(head.x - camera.x, head.y - camera.y, this.radius, 0, Math.PI * 2);
+                ctx.fill();
+
+                ctx.fillStyle = '#fff';
+                ctx.font = '11px sans-serif';
+                ctx.textAlign = 'center';
+                ctx.fillText(this.name, head.x - camera.x, head.y - camera.y - this.radius - 5);
+            }
+        }
+
+        class Food {
+            constructor(x, y) {
+                this.x = x || randomRange(20, WORLD_SIZE - 20);
+                this.y = y || randomRange(20, WORLD_SIZE - 20);
+                this.radius = randomRange(3, 6);
+                this.color = COLORS[Math.floor(Math.random() * COLORS.length)];
+            }
+            draw() {
+                ctx.fillStyle = this.color;
+                ctx.beginPath();
+                ctx.arc(this.x - camera.x, this.y - camera.y, this.radius, 0, Math.PI * 2);
+                ctx.fill();
+            }
+        }
+
+        function init() {
+            resizeCanvas();
+            isGameOver = false;
+            document.getElementById('game-over').style.display = 'none';
+
+            player = new Snake(WORLD_SIZE / 2, WORLD_SIZE / 2, "You", false);
+            snakes = [player];
+
+            for (let i = 0; i < AI_COUNT; i++) {
+                let name = AI_NAMES[i % AI_NAMES.length] + " [" + Math.floor(randomRange(10,99)) + "]";
+                snakes.push(new Snake(randomRange(100, WORLD_SIZE - 100), randomRange(100, WORLD_SIZE - 100), name, true));
+            }
+
+            foods = [];
+            for (let i = 0; i < FOOD_COUNT; i++) {
+                foods.push(new Food());
+            }
+        }
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+
+        function loop() {
+            update();
+            draw();
+            requestAnimationFrame(loop);
+        }
+
+        function update() {
+            if (!isGameOver) {
+                let head = player.segments[0];
+                camera.x = head.x - canvas.width / 2;
+                camera.y = head.y - canvas.height / 2;
+            }
+
+            for (let i = snakes.length - 1; i >= 0; i--) {
+                let snake = snakes[i];
+                snake.update();
+
+                if (snake.segments.length === 0) continue;
+                let head = snake.segments[0];
+
+                for (let j = foods.length - 1; j >= 0; j--) {
+                    let food = foods[j];
+                    if (getDistance(head.x, head.y, food.x, food.y) < snake.radius + food.radius) {
+                        snake.grow(1);
+                        foods.splice(j, 1);
+                        foods.push(new Food());
+                    }
+                }
+
+                for (let opponent of snakes) {
+                    if (opponent === snake) continue;
+                    for (let seg of opponent.segments) {
+                        if (getDistance(head.x, head.y, seg.x, seg.y) < snake.radius + opponent.radius - 3) {
+                            handleSnakeDeath(snake);
+                            break;
+                        }
+                    }
+                }
+            }
+            updateLeaderboard();
+        }
+
+        function handleSnakeDeath(snake) {
+            for (let seg of snake.segments) {
+                if (Math.random() < 0.4) foods.push(new Food(seg.x, seg.y));
+            }
+
+            if (!snake.isAI) {
+                isGameOver = true;
+                document.getElementById('game-over').style.display = 'block';
+                document.getElementById('final-score').innerText = snake.score;
+            } else {
+                let index = snakes.indexOf(snake);
+                if (index > -1) {
+                    let name = AI_NAMES[Math.floor(Math.random() * AI_NAMES.length)] + " [" + Math.floor(randomRange(10,99)) + "]";
+                    snakes[index] = new Snake(randomRange(100, WORLD_SIZE - 100), randomRange(100, WORLD_SIZE - 100), name, true);
+                }
+            }
+        }
+
+        function draw() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            ctx.strokeStyle = '#444';
+            ctx.lineWidth = 8;
+            ctx.strokeRect(0 - camera.x, 0 - camera.y, WORLD_SIZE, WORLD_SIZE);
+
+            ctx.strokeStyle = '#222';
+            ctx.lineWidth = 1;
+            const gridSize = 120;
+            let startX = Math.max(0, Math.floor(camera.x / gridSize) * gridSize);
+            let endX = Math.min(WORLD_SIZE, Math.ceil((camera.x + canvas.width) / gridSize) * gridSize);
+            let startY = Math.max(0, Math.floor(camera.y / gridSize) * gridSize);
+            let endY = Math.min(WORLD_SIZE, Math.ceil((camera.y + canvas.height) / gridSize) * gridSize);
+
+            for (let x = startX; x <= endX; x += gridSize) {
+                ctx.beginPath(); ctx.moveTo(x - camera.x, startY - camera.y); ctx.lineTo(x - camera.x, endY - camera.y); ctx.stroke();
+            }
+            for (let y = startY; y <= endY; y += gridSize) {
+                ctx.beginPath(); ctx.moveTo(startX - camera.x, y - camera.y); ctx.lineTo(endX - camera.x, y - camera.y); ctx.stroke();
+            }
+
+            for (let food of foods) food.draw();
+            for (let snake of snakes) snake.draw();
+
+            document.getElementById('score').innerText = player.score;
+            renderMinimap();
+        }
+
+        function renderMinimap() {
+            miniCtx.clearRect(0, 0, minimapCanvas.width, minimapCanvas.height);
+            let scale = minimapCanvas.width / WORLD_SIZE;
+
+            miniCtx.fillStyle = 'rgba(255,255,255,0.05)';
+            miniCtx.fillRect(0, 0, minimapCanvas.width, minimapCanvas.height);
+
+            for (let snake of snakes) {
+                if (snake.segments.length === 0) continue;
+                miniCtx.fillStyle = snake.isAI ? '#ff3333' : '#00ffcc';
+                let head = snake.segments[0];
+                miniCtx.beginPath();
+                miniCtx.arc(head.x * scale, head.y * scale, snake.isAI ? 1 : 2.5, 0, Math.PI * 2);
+                miniCtx.fill();
+            }
+        }
+
+        function updateLeaderboard() {
+            let sorted = [...snakes].sort((a, b) => b.score - a.score).slice(0, 5);
+            let html = '';
+            sorted.forEach((snake, idx) => {
+                let isCurrentPlayer = !snake.isAI ? 'player' : '';
+                html += `<div class="leaderboard-entry ${isCurrentPlayer}">
+                    <span>${idx + 1}. ${snake.name}</span>
+                    <span>${snake.score}</span>
+                </div>`;
+            });
+            document.getElementById('leaderboard-content').innerHTML = html;
+        }
+
+        function resetGame() { init(); }
+
+        // --- Fullscreen Toggle Logic ---
+        function toggleFullscreen() {
+            if (!document.fullscreenElement && !document.webkitFullscreenElement) {
+                if (container.requestFullscreen) {
+                    container.requestFullscreen().catch(err => console.log(err));
+                } else if (container.webkitRequestFullscreen) {
+                    container.webkitRequestFullscreen();
+                }
+            } else {
+                if (document.exitFullscreen) {
+                    document.exitFullscreen();
+                } else if (document.webkitExitFullscreen) {
+                    document.webkitExitFullscreen();
+                }
+            }
+        }
+
+        // --- Touch & Controls Setup ---
+        window.addEventListener('resize', resizeCanvas);
+        window.addEventListener('mousemove', (e) => { mouse.x = e.clientX; mouse.y = e.clientY; lastInputType = 'mouse'; });
+        window.addEventListener('mousedown', () => { mouse.isDown = true; lastInputType = 'mouse'; });
+        window.addEventListener('mouseup', () => { mouse.isDown = false; });
+        window.addEventListener('keydown', (e) => { keys[e.code] = true; });
+        window.addEventListener('keyup', (e) => { keys[e.code] = false; });
+
+        // Fullscreen Click/Tap bound strictly to the Score HUD
+        hudElement.addEventListener('touchstart', (e) => {
+            e.stopPropagation(); 
+            toggleFullscreen();
+        }, { passive: true });
+
+        hudElement.addEventListener('click', (e) => {
+            toggleFullscreen();
+        });
+
+        // Touch Joystick Logic
+        function handleJoystick(e) {
+            e.preventDefault();
+            const touch = e.touches[0];
+            const rect = joystickContainer.getBoundingClientRect();
+            const centerX = rect.left + rect.width / 2;
+            const centerY = rect.top + rect.height / 2;
+            
+            let deltaX = touch.clientX - centerX;
+            let deltaY = touch.clientY - centerY;
+            let dist = Math.hypot(deltaX, deltaY);
+            const maxDist = rect.width / 2;
+
+            if (dist > maxDist) {
+                deltaX = (deltaX / dist) * maxDist;
+                deltaY = (deltaY / dist) * maxDist;
+            }
+
+            joystickKnob.style.transform = `translate(${deltaX}px, ${deltaY}px)`;
+            joystickAngle = Math.atan2(deltaY, deltaX);
+            joystickActive = true;
+            lastInputType = 'touch'; // Lock input type to touch while gamepad is held
+        }
+
+        joystickContainer.addEventListener('touchstart', (e) => { handleJoystick(e); });
+        joystickContainer.addEventListener('touchmove', (e) => { handleJoystick(e); });
+        joystickContainer.addEventListener('touchend', () => {
+            joystickKnob.style.transform = `translate(0px, 0px)`;
+            joystickActive = false;
+            
+            // Critical Fix: Save the angle when letting go so the snake keeps moving straight
+            if (player) {
+                player.angle = joystickAngle;
+            }
+        });
+
+        boostBtn.addEventListener('touchstart', (e) => { e.preventDefault(); touchBoosting = true; lastInputType = 'touch'; boostBtn.style.background = 'rgba(255, 51, 102, 0.9)'; });
+        boostBtn.addEventListener('touchend', () => { touchBoosting = false; boostBtn.style.background = 'rgba(255, 51, 102, 0.6)'; });
+
+        init();
+        loop();
+    </script>
+</body>
+</html>
